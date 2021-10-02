@@ -42,11 +42,8 @@ objects.ground.body = love.physics.newBody(world, ww/2, wh-50/2)
 objects.ground.shape = love.physics.newRectangleShape(ww, 50)
 objects.ground.fixture = love.physics.newFixture(objects.ground.body, objects.ground.shape)
 
--- local cow = o.new(world)
-
 love.graphics.setBackgroundColor(0.41, 0.53, 0.97)
 
-    local test = false
 function Game:keypressed(key)
     if key == "space" then
         table.insert(objects.blocks, o.new(world))
@@ -60,9 +57,6 @@ end
 
 function Game:draw()
     love.graphics.setColor(1, 1, 1)
-    if test then
-        love.graphics.polygon("fill", objects.blocks[1]:getWorldPoints(objects.blocks[2]:getPoints()))
-    end
     love.graphics.setColor(0.28, 0.63, 0.05)
     love.graphics.polygon("fill", objects.ground.body:getWorldPoints(objects.ground.shape:getPoints()))
     
