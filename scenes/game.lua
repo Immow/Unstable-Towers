@@ -27,12 +27,13 @@ function tprint (tbl, indent)
 end
 
 local o = require("scenes.object")
+local gravity = 5*64 -- 9.81*64 = default
 
 local Game = {}
 local ww, wh = love.graphics.getDimensions()
 
 love.physics.setMeter(64)
-local world = love.physics.newWorld(0, 9.81*64, true)
+local world = love.physics.newWorld(0, gravity, true)
 
 local objects = {}
 objects.blocks = {}
@@ -41,6 +42,16 @@ objects.ground = {}
 objects.ground.body = love.physics.newBody(world, ww/2, wh-50/2)
 objects.ground.shape = love.physics.newRectangleShape(ww, 50)
 objects.ground.fixture = love.physics.newFixture(objects.ground.body, objects.ground.shape)
+
+local wallWidth = 50
+objects.leftWall = {}
+objects.leftWall.body = love.physics.newBody(world, wallWidth/2,wh/2)
+objects.leftWall.shape = love.physics.newRectangleShape(wallWidth, wh)
+objects.leftWall.fixture = love.physics.newFixture(objects.leftWall.body, objects.leftWall.shape)
+objects.rightWall = {}
+objects.rightWall.body = love.physics.newBody(world, ww-wallWidth/2,wh/2)
+objects.rightWall.shape = love.physics.newRectangleShape(wallWidth, wh)
+objects.rightWall.fixture = love.physics.newFixture(objects.rightWall.body, objects.rightWall.shape)
 
 love.graphics.setBackgroundColor(0.41, 0.53, 0.97)
 
@@ -53,12 +64,17 @@ end
 
 function Game:update(dt)
     world:update(dt)
+    for i = #objects.blocks, 1, -1 do
+        objects.blocks[i]:update(dt)
+    end
 end
 
 function Game:draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.setColor(0.28, 0.63, 0.05)
     love.graphics.polygon("fill", objects.ground.body:getWorldPoints(objects.ground.shape:getPoints()))
+    love.graphics.polygon("fill", objects.leftWall.body:getWorldPoints(objects.leftWall.shape:getPoints()))
+    love.graphics.polygon("fill", objects.rightWall.body:getWorldPoints(objects.rightWall.shape:getPoints()))
     
     for i = #objects.blocks, 1, -1 do
         objects.blocks[i]:draw()
