@@ -8,7 +8,7 @@ function love.conf(t)
     t.window.fullscreen = false
     t.window.msaa = 8
     t.modules.joystick = false
-    t.modules.physics = false
+    t.modules.physics = true
     t.externalstorage = true
     t.window.vsync = 0
     t.window.resizable = false
