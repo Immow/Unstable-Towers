@@ -15,33 +15,46 @@ function Object.new(world)
         o.h = h
         o.force = 400
         o.remove = false
+        o.time = 0
     setmetatable(o, Object)
     return o
 end
 
 function Object:update(dt)
     local y = self.body:getY()
-    if y + self.h > love.graphics.getHeight() then
+    if y > love.graphics.getHeight() then
         self.remove = true
     end
 
+    local left  = love.keyboard.isDown("left")
+    local right = love.keyboard.isDown("right")
+    local up    = love.keyboard.isDown("up")
+    local down  = love.keyboard.isDown("down")
+
     self.body:setMass(1)
     if self.active then
-        -- local mass = self.body:getMass()
-        if love.keyboard.isDown("right") then
+        if right then
             self.body:applyForce(self.force, 0)
-        elseif love.keyboard.isDown("left") then
+        elseif left then
             self.body:applyForce(-self.force, 0)
-        elseif love.keyboard.isDown("up") then
+        elseif up then
             self.body:applyForce(0, -self.force * 2)
-        elseif love.keyboard.isDown("down") then
+        elseif down then
             self.body:applyForce(0, self.force)
         end
     end
-    
+
+    if not self.active then return end
+
     local xVel, yVel = self.body:getLinearVelocity()
-    if xVel < 0.001 and yVel < 0.001 then
-        self.active = false
+    local total = math.abs(xVel) + math.abs(yVel)
+    if total < 0.0001 and not left and not right and not up and not down then
+        self.time = self.time + 0.1 * dt
+        if self.time > 0.01 then
+            self.active = false
+        end
+    else
+        self.time = 0
     end
 end
 
@@ -50,7 +63,10 @@ function Object:draw()
     love.graphics.setColor(0.2,0.2,0.2,1)
     love.graphics.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))
     love.graphics.setColor(1,1,1,1)
-    love.graphics.print(tostring(self.active).."\n"..self.body:getMass(),x-self.w/2,y-self.h/2)
+    love.graphics.print(tostring(self.active).."\n"
+        ..self.body:getMass().."\n"
+        ..self.time
+        ,x-self.w/2,y-self.h/2)
 end
 
 return Object
