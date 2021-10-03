@@ -31,6 +31,8 @@ function Object:update(dt)
     local right = love.keyboard.isDown("right")
     local up    = love.keyboard.isDown("up")
     local down  = love.keyboard.isDown("down")
+    local alt   = love.keyboard.isDown("lalt" or "ralt")
+    local ctrl  = love.keyboard.isDown("lctrl" or "rctrl")
 
     self.body:setMass(1)
     if self.active then
@@ -42,6 +44,10 @@ function Object:update(dt)
             self.body:applyForce(0, -self.force * 2)
         elseif down then
             self.body:applyForce(0, self.force)
+        elseif alt then
+            self.body:applyTorque(1500)
+        elseif ctrl then
+            self.body:applyTorque(-1500)
         end
     end
 
