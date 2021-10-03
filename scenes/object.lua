@@ -16,13 +16,14 @@ function Object.new(world)
         o.force = 400
         o.remove = false
         o.time = 0
+        o.vel = 0
     setmetatable(o, Object)
     return o
 end
 
 function Object:update(dt)
     local y = self.body:getY()
-    if y > love.graphics.getHeight() then
+    if y - 100 > love.graphics.getHeight() then
         self.remove = true
     end
 
@@ -47,8 +48,8 @@ function Object:update(dt)
     if not self.active then return end
 
     local xVel, yVel = self.body:getLinearVelocity()
-    local total = math.abs(xVel) + math.abs(yVel)
-    if total < 0.0001 and not left and not right and not up and not down then
+    self.vel = math.abs(xVel) + math.abs(yVel)
+    if self.vel < 5 and not left and not right and not up and not down then
         self.time = self.time + 0.1 * dt
         if self.time > 0.01 then
             self.active = false
@@ -65,7 +66,8 @@ function Object:draw()
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(tostring(self.active).."\n"
         ..self.body:getMass().."\n"
-        ..self.time
+        ..self.time.."\n"
+        ..self.vel.."\n"
         ,x-self.w/2,y-self.h/2)
 end
 

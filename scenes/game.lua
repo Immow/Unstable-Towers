@@ -55,35 +55,42 @@ objects.rightWall.fixture = love.physics.newFixture(objects.rightWall.body, obje
 
 love.graphics.setBackgroundColor(0.41, 0.53, 0.97)
 
-local continue = true
+local continue = false
 function Game:keypressed(key)
-    if key == "space" then
+    if key == "space" and not continue then
         table.insert(objects.blocks, o.new(world))
         -- print(tprint(objects))
-        continue = false
+        continue = true
     end
 end
 
 function Game:removeObject(i)
     if objects.blocks[i].remove then
-        -- objects.blocks[i].body:destroy()
         table.remove(objects.blocks, i)
+    end
+end
+
+function Game:addObject()
+    if not objects.blocks[#objects.blocks].active and continue then
+        table.insert(objects.blocks, o.new(world))
+    end
+end
+
+function Game:updateObject(dt)
+    for i = #objects.blocks, 1, -1 do
+        objects.blocks[i]:update(dt)
+        self:addObject()
+        self:removeObject(i)
     end
 end
 
 function Game:update(dt)
     world:update(dt)
-    for i = #objects.blocks, 1, -1 do
-        objects.blocks[i]:update(dt)
-        if not objects.blocks[#objects.blocks].active then
-            table.insert(objects.blocks, o.new(world))
-        end
-        self:removeObject(i)
-    end
+    self:updateObject(dt)
 end
 
 function Game:continue()
-    if continue then
+    if not continue then
         love.graphics.setFont(Font)
         love.graphics.printf("PRESS SPACE TO START\nUSE ARROW KEYS TO MOVE", 0, wh/2, ww,"center")
         love.graphics.setFont(DefaultFont)
