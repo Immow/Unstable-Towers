@@ -3,8 +3,8 @@ local Object = {}
 Object.__index = Object
 
 function Object.new(world)
-    local w = love.math.random(10,100)
-    local h = love.math.random(10,100)
+    local w = love.math.random(20,100)
+    local h = love.math.random(20,100)
 
     local o = {}
         o.body = love.physics.newBody(world, 200, 0, "dynamic")
@@ -14,26 +14,32 @@ function Object.new(world)
         o.w = w
         o.h = h
         o.force = 400
+        o.remove = false
     setmetatable(o, Object)
     return o
 end
 
 function Object:update(dt)
+    local y = self.body:getY()
+    if y + self.h > love.graphics.getHeight() then
+        self.remove = true
+    end
+
+    self.body:setMass(1)
     if self.active then
-        local mass = self.body:getMass()
-        if mass < 1 then self.force = 100 end
+        -- local mass = self.body:getMass()
         if love.keyboard.isDown("right") then
             self.body:applyForce(self.force, 0)
         elseif love.keyboard.isDown("left") then
             self.body:applyForce(-self.force, 0)
         elseif love.keyboard.isDown("up") then
-            self.body:applyForce(0, -self.force)
+            self.body:applyForce(0, -self.force * 2)
         elseif love.keyboard.isDown("down") then
             self.body:applyForce(0, self.force)
         end
     end
     
-local xVel, yVel = self.body:getLinearVelocity()
+    local xVel, yVel = self.body:getLinearVelocity()
     if xVel < 0.001 and yVel < 0.001 then
         self.active = false
     end

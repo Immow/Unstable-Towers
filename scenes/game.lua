@@ -39,8 +39,8 @@ local objects = {}
 objects.blocks = {}
 
 objects.ground = {}
-objects.ground.body = love.physics.newBody(world, ww/2, wh-50/2)
-objects.ground.shape = love.physics.newRectangleShape(ww, 50)
+objects.ground.body = love.physics.newBody(world, ww/2-50, wh-50/2)
+objects.ground.shape = love.physics.newRectangleShape(100, 50)
 objects.ground.fixture = love.physics.newFixture(objects.ground.body, objects.ground.shape)
 
 local wallWidth = 50
@@ -62,11 +62,27 @@ function Game:keypressed(key)
     end
 end
 
+function Game:removeObject(i)
+    if objects.blocks[i].remove then
+        objects.blocks[i].body:destroy()
+        table.remove(objects.blocks, i)
+    end
+end
+
+local count = 0
 function Game:update(dt)
     world:update(dt)
     for i = #objects.blocks, 1, -1 do
         objects.blocks[i]:update(dt)
+        if not objects.blocks[i].active then
+            count = count + 1
+            if count == #objects.blocks then
+                table.insert(objects.blocks, o.new(world))
+            end
+        end
+        self:removeObject(i)
     end
+    count = 0
 end
 
 function Game:draw()
@@ -79,6 +95,7 @@ function Game:draw()
     for i = #objects.blocks, 1, -1 do
         objects.blocks[i]:draw()
     end
+    love.graphics.print(#objects.blocks)
 end
 
 return Game
