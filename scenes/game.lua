@@ -1,55 +1,26 @@
 ---@diagnostic disable: redundant-parameter
 
--- FUNCTION TO PRINT TABLES
-function tprint (tbl, indent)
-    if not indent then indent = 0 end
-    local toprint = string.rep(" ", indent) .. "{\r\n"
-    indent = indent + 2 
-    for k, v in pairs(tbl) do
-        toprint = toprint .. string.rep(" ", indent)
-        if (type(k) == "number") then
-            toprint = toprint .. "[" .. k .. "] = "
-        elseif (type(k) == "string") then
-            toprint = toprint  .. k ..  "= "   
-        end
-        if (type(v) == "number") then
-            toprint = toprint .. v .. ",\r\n"
-        elseif (type(v) == "string") then
-            toprint = toprint .. "\"" .. v .. "\",\r\n"
-        elseif (type(v) == "table") then
-            toprint = toprint .. tprint(v, indent + 2) .. ",\r\n"
-        else
-            toprint = toprint .. "\"" .. tostring(v) .. "\",\r\n"
-        end
-    end
-    toprint = toprint .. string.rep(" ", indent-2) .. "}"
-    return toprint
-end
-
+local Square = require("scenes.square")
 local o = require("scenes.object")
-local gravity = 5*64 -- 9.81*64 = default
 
 local Game = {}
 local ww, wh = love.graphics.getDimensions()
-
-love.physics.setMeter(64)
-local world = love.physics.newWorld(0, gravity, true)
 
 local objects = {}
 objects.blocks = {}
 
 objects.ground = {}
-objects.ground.body = love.physics.newBody(world, ww/2, wh-50/2)
+objects.ground.body = love.physics.newBody(World, ww/2, wh-50/2)
 objects.ground.shape = love.physics.newRectangleShape(100, 50)
 objects.ground.fixture = love.physics.newFixture(objects.ground.body, objects.ground.shape)
 
 local wallWidth = 50
 objects.leftWall = {}
-objects.leftWall.body = love.physics.newBody(world, wallWidth/2,wh/2)
+objects.leftWall.body = love.physics.newBody(World, wallWidth/2,wh/2)
 objects.leftWall.shape = love.physics.newRectangleShape(wallWidth, wh)
 objects.leftWall.fixture = love.physics.newFixture(objects.leftWall.body, objects.leftWall.shape)
 objects.rightWall = {}
-objects.rightWall.body = love.physics.newBody(world, ww-wallWidth/2,wh/2)
+objects.rightWall.body = love.physics.newBody(World, ww-wallWidth/2,wh/2)
 objects.rightWall.shape = love.physics.newRectangleShape(wallWidth, wh)
 objects.rightWall.fixture = love.physics.newFixture(objects.rightWall.body, objects.rightWall.shape)
 
@@ -58,24 +29,24 @@ love.graphics.setBackgroundColor(0.41, 0.53, 0.97)
 local continue = false
 function Game:keypressed(key)
     if key == "space" and not continue then
-        table.insert(objects.blocks, o.new(world))
-        -- print(tprint(objects))
+        table.insert(objects.blocks, o.new(Square.new()))
+        print(tprint(objects.blocks))
         continue = true
     end
 end
 
 function Game:removeObject(i)
     if objects.blocks[i].remove then
-        if i == 1 then -- have to add an object despite this is a remove function else the loop ends :(
-            table.insert(objects.blocks,i+1,o.new(world))
-        end
+        -- if i == 1 then -- have to add an object despite this is a remove function else the loop ends :(
+        --     table.insert(objects.blocks,i+1,o.new(Square.new()))
+        -- end
         table.remove(objects.blocks, i)
     end
 end
 
 function Game:addObject()
     if not objects.blocks[#objects.blocks].active and continue then
-        table.insert(objects.blocks, o.new(world))
+        table.insert(objects.blocks, o.new(Square.new()))
     end
 end
 
@@ -88,7 +59,7 @@ function Game:updateObject(dt)
 end
 
 function Game:update(dt)
-    world:update(dt)
+    World:update(dt)
     self:updateObject(dt)
 end
 
