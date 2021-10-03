@@ -39,7 +39,7 @@ local objects = {}
 objects.blocks = {}
 
 objects.ground = {}
-objects.ground.body = love.physics.newBody(world, ww/2-50, wh-50/2)
+objects.ground.body = love.physics.newBody(world, ww/2, wh-50/2)
 objects.ground.shape = love.physics.newRectangleShape(100, 50)
 objects.ground.fixture = love.physics.newFixture(objects.ground.body, objects.ground.shape)
 
@@ -66,6 +66,9 @@ end
 
 function Game:removeObject(i)
     if objects.blocks[i].remove then
+        if i == 1 then -- have to add an object despite this is a remove function else the loop ends :(
+            table.insert(objects.blocks,i+1,o.new(world))
+        end
         table.remove(objects.blocks, i)
     end
 end
