@@ -2,6 +2,8 @@ local scene
 
 function love.load()
     ChangeScene("game")
+    DefaultFont = love.graphics.getFont()
+    Font = love.graphics.newFont("assets/font/PressStart2P-Regular.ttf", 18)
 end
 
 function love.update(dt)

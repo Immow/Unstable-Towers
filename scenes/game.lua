@@ -55,38 +55,44 @@ objects.rightWall.fixture = love.physics.newFixture(objects.rightWall.body, obje
 
 love.graphics.setBackgroundColor(0.41, 0.53, 0.97)
 
+local continue = true
 function Game:keypressed(key)
     if key == "space" then
         table.insert(objects.blocks, o.new(world))
         -- print(tprint(objects))
+        continue = false
     end
 end
 
 function Game:removeObject(i)
     if objects.blocks[i].remove then
-        objects.blocks[i].body:destroy()
+        -- objects.blocks[i].body:destroy()
         table.remove(objects.blocks, i)
     end
 end
 
-local count = 0
 function Game:update(dt)
     world:update(dt)
     for i = #objects.blocks, 1, -1 do
         objects.blocks[i]:update(dt)
-        if not objects.blocks[i].active then
-            count = count + 1
-            if count == #objects.blocks then
-                table.insert(objects.blocks, o.new(world))
-            end
+        if not objects.blocks[#objects.blocks].active then
+            table.insert(objects.blocks, o.new(world))
         end
         self:removeObject(i)
     end
-    count = 0
+end
+
+function Game:continue()
+    if continue then
+        love.graphics.setFont(Font)
+        love.graphics.printf("PRESS SPACE TO START\nUSE ARROW KEYS TO MOVE", 0, wh/2, ww,"center")
+        love.graphics.setFont(DefaultFont)
+    end
 end
 
 function Game:draw()
     love.graphics.setColor(1, 1, 1)
+    self:continue()
     love.graphics.setColor(0.28, 0.63, 0.05)
     love.graphics.polygon("fill", objects.ground.body:getWorldPoints(objects.ground.shape:getPoints()))
     love.graphics.polygon("fill", objects.leftWall.body:getWorldPoints(objects.leftWall.shape:getPoints()))
