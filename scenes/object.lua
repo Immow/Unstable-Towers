@@ -33,7 +33,7 @@ function Object.new()
         o.imageScaleW = w / o.imageWidth
         o.imageScaleH = h / o.imageHeight
         o.rotate = love.audio.newSource(Sound.rotate, "static")
-        o.scratch = love.audio.newSource(Sound.scratch, "static")
+        o.spawn = love.audio.newSource(Sound.spawn, "static")
     setmetatable(o, Object)
     return o
 end
@@ -77,7 +77,7 @@ function Object:update(dt)
     if self.vel < 5 and not left and not right and not up and not down then
         self.time = self.time + 0.1 * dt
         if self.time > 0.01 then
-            -- self.scratch:play()
+            self.spawn:play()
             self.active = false
         end
     else

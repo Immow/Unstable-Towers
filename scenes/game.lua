@@ -100,10 +100,10 @@ function Game:updateObject(dt)
 end
 
 function Game:music()
-    -- if not Sound.music:isPlaying() then
-	-- 	Sound.music:play()
-    --     Sound.music:setVolume(0.05)
-	-- end
+    if not Sound.music:isPlaying() then
+		Sound.music:play()
+        Sound.music:setVolume(0.05)
+	end
 end
 
 function Game:update(dt)
