@@ -77,7 +77,7 @@ function Object:update(dt)
     if self.vel < 5 and not left and not right and not up and not down then
         self.time = self.time + 0.1 * dt
         if self.time > 0.01 then
-            self.scratch:play()
+            -- self.scratch:play()
             self.active = false
         end
     else

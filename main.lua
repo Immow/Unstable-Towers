@@ -27,6 +27,31 @@ end
 
 local Sound = require("assets.sounds.sound")
 local scene
+local bump = love.audio.newSource(Sound.bump, "static")
+
+function randomFloat(a, b)
+    return a + math.random() * (b - a)
+end
+
+local persisting = 0
+function beginContact(a, b, coll)
+    bump:setPitch(randomFloat(0.2, 2))
+    bump:play()
+end
+
+function endContact(a, b, coll)
+    persisting = 0
+end
+
+function preSolve(a, b, coll)
+    if persisting == 0 then    -- only say when they first start touching
+    end
+    persisting = persisting + 1
+end
+
+function postSolve(a, b, coll, normalimpulse, tangentimpulse)
+    
+end
 
 function love.load()
     Debug = false
@@ -39,26 +64,6 @@ function love.load()
     Font = love.graphics.newFont("assets/font/PressStart2P-Regular.ttf", 18)
 
     World:setCallbacks(beginContact, endContact, preSolve, postSolve)
-
-    local persisting = 0
-
-    function beginContact(a, b, coll)
-        Sound.scratch:play()
-    end
-
-    function endContact(a, b, coll)
-        persisting = 0
-    end
-
-    function preSolve(a, b, coll)
-        if persisting == 0 then    -- only say when they first start touching
-        end
-        persisting = persisting + 1
-    end
-
-    function postSolve(a, b, coll, normalimpulse, tangentimpulse)
-        
-    end
 end
 
 function love.update(dt)
