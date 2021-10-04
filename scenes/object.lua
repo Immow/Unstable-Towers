@@ -1,4 +1,6 @@
 ---@diagnostic disable: redundant-parameter
+local Sound = require("assets.sounds.sound")
+local ww = love.graphics.getWidth()
 
 local Object = {}
 Object.__index = Object
@@ -6,13 +8,16 @@ Object.__index = Object
 local img1 = love.graphics.newImage("assets/images/1.png")
 local img2 = love.graphics.newImage("assets/images/2.png")
 
+
+
 function Object.new()
+    local dropSpot
     local w = love.math.random(30,100)
     local h = love.math.random(30,100)
     local r = love.math.random(1,2)
-
+    if r == 1 then dropSpot = 200 else dropSpot = ww-200 end
     local o = {}
-        o.body = love.physics.newBody(World, 200, 0, "dynamic")
+        o.body = love.physics.newBody(World, dropSpot, 0, "dynamic")
         o.shape = love.physics.newRectangleShape(0, 0, w, h)
         o.fixture = love.physics.newFixture(o.body, o.shape, 1)
         o.active = true
@@ -27,6 +32,8 @@ function Object.new()
         o.imageHeight = o.image():getHeight()
         o.imageScaleW = w / o.imageWidth
         o.imageScaleH = h / o.imageHeight
+        o.rotate = love.audio.newSource(Sound.rotate, "static")
+        o.scratch = love.audio.newSource(Sound.scratch, "static")
     setmetatable(o, Object)
     return o
 end
@@ -41,8 +48,8 @@ function Object:update(dt)
     local right = love.keyboard.isDown("right")
     local up    = love.keyboard.isDown("up")
     local down  = love.keyboard.isDown("down")
-    local alt   = love.keyboard.isDown("lalt" or "ralt")
-    local ctrl  = love.keyboard.isDown("lctrl" or "rctrl")
+    local alt   = love.keyboard.isDown("lalt")
+    local ctrl  = love.keyboard.isDown("lctrl")
 
     self.body:setMass(1)
     if self.active then
@@ -56,8 +63,10 @@ function Object:update(dt)
             self.body:applyForce(0, self.force)
         elseif alt then
             self.body:applyTorque(1500)
+            self.rotate:play()
         elseif ctrl then
             self.body:applyTorque(-1500)
+            self.rotate:play()
         end
     end
 
@@ -68,12 +77,17 @@ function Object:update(dt)
     if self.vel < 5 and not left and not right and not up and not down then
         self.time = self.time + 0.1 * dt
         if self.time > 0.01 then
+            self.scratch:play()
             self.active = false
         end
     else
         self.time = 0
     end
 end
+
+-- function Object:beginContact(a, b, coll)
+    
+-- end
 
 function Object:draw()
     local x,y = self.body:getPosition()

@@ -1,11 +1,9 @@
----@diagnostic disable: redundant-parameter
+---@diagnostic disable: redundant-parameter, undefined-global, lowercase-global
 
-local Square = require("scenes.square")
-local Bar = require("scenes.bar")
-local T = require("scenes.t")
-
+local Sound = require("assets.sounds.sound")
 local o = require("scenes.object")
 
+-- local scratch = love.audio.newSource(Sound.scratch, "static")
 local Game = {}
 local ww, wh = love.graphics.getDimensions()
 
@@ -28,13 +26,6 @@ objects.rightWall.shape = love.physics.newRectangleShape(wallWidth, wh)
 objects.rightWall.fixture = love.physics.newFixture(objects.rightWall.body, objects.rightWall.shape)
 
 love.graphics.setBackgroundColor(0.41, 0.53, 0.97)
-
-function Game:RandomShape()
-    local r = love.math.random(1,1)
-    if r == 1 then return Square.new() end
-    if r == 2 then return Bar.new() end
-    if r == 3 then return T.new() end
-end
 
 local win = false
 local continue = false
@@ -65,21 +56,26 @@ function Game:addObject1()
     end
 end
 
+local WinconditionValue = 15
 local winTimerAmount = 3
 local winTimer = winTimerAmount
 function Game:score()
     love.graphics.setFont(Font)
     Font:setLineHeight(1.5)
-    love.graphics.print(#objects.blocks.."\n"..winTimer)
-    if #objects.blocks >= 2 then -- Wincondition
+    love.graphics.print(#objects.blocks,5,5)
+    if #objects.blocks >= WinconditionValue then -- Wincondition
         win = true
-        -- objects.blocks = {}
         for i = 1, #objects.blocks do
             objects.blocks[i].remove = true
         end
-        -- print(tprint(objects.blocks))
     end
     love.graphics.setFont(DefaultFont)
+end
+
+function Game:keyreleased(key)
+    if key == "lalt" or "lctrl" then
+        -- love.audio.stop()
+    end 
 end
 
 function Game:winDraw()
@@ -103,7 +99,15 @@ function Game:updateObject(dt)
     end
 end
 
+function Game:music()
+    -- if not Sound.music:isPlaying() then
+	-- 	Sound.music:play()
+    --     Sound.music:setVolume(0.05)
+	-- end
+end
+
 function Game:update(dt)
+    self:music()
     World:update(dt)
     self:updateObject(dt)
     if win then
@@ -118,9 +122,12 @@ end
 
 function Game:continue()
     if not continue and not win then
+        local text = "PRESS SPACE TO START\nUSE ARROW KEYS TO MOVE\nLEFT CTRL AND ALT TO ROTATE\n YOU WIN WHEN YOU STACK:"..WinconditionValue.." CRATES"
         love.graphics.setFont(Font)
+        local fontHeight = Font:getHeight()
         Font:setLineHeight(1.5)
-        love.graphics.printf("PRESS SPACE TO START\nUSE ARROW KEYS TO MOVE\nCTRL AND ALT TO ROTATE", 0, wh/2, ww,"center")
+
+        love.graphics.printf(text, 0, wh/2 - 4 * fontHeight, ww,"center")
         love.graphics.setFont(DefaultFont)
     end
 end

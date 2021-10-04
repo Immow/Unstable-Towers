@@ -1,5 +1,4 @@
 ---@diagnostic disable: redundant-parameter
-
 -- FUNCTION TO PRINT TABLES
 function tprint (tbl, indent)
     if not indent then indent = 0 end
@@ -26,6 +25,7 @@ function tprint (tbl, indent)
     return toprint
 end
 
+local Sound = require("assets.sounds.sound")
 local scene
 
 function love.load()
@@ -33,9 +33,32 @@ function love.load()
     love.physics.setMeter(64)
     local gravity = 5*64 -- 9.81*64 = default
     World = love.physics.newWorld(0, gravity, true)
+    
     ChangeScene("game")
     DefaultFont = love.graphics.getFont()
     Font = love.graphics.newFont("assets/font/PressStart2P-Regular.ttf", 18)
+
+    World:setCallbacks(beginContact, endContact, preSolve, postSolve)
+
+    local persisting = 0
+
+    function beginContact(a, b, coll)
+        Sound.scratch:play()
+    end
+
+    function endContact(a, b, coll)
+        persisting = 0
+    end
+
+    function preSolve(a, b, coll)
+        if persisting == 0 then    -- only say when they first start touching
+        end
+        persisting = persisting + 1
+    end
+
+    function postSolve(a, b, coll, normalimpulse, tangentimpulse)
+        
+    end
 end
 
 function love.update(dt)
