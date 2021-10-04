@@ -3,9 +3,13 @@
 local Object = {}
 Object.__index = Object
 
+local img1 = love.graphics.newImage("assets/images/1.png")
+local img2 = love.graphics.newImage("assets/images/2.png")
+
 function Object.new()
     local w = love.math.random(30,100)
     local h = love.math.random(30,100)
+    local r = love.math.random(1,2)
 
     local o = {}
         o.body = love.physics.newBody(World, 200, 0, "dynamic")
@@ -18,6 +22,11 @@ function Object.new()
         o.remove = false
         o.time = 0
         o.vel = 0
+        o.image = function () if r == 1 then return img1 else return img2 end end
+        o.imageWidth = o.image():getWidth()
+        o.imageHeight = o.image():getHeight()
+        o.imageScaleW = w / o.imageWidth
+        o.imageScaleH = h / o.imageHeight
     setmetatable(o, Object)
     return o
 end
@@ -71,11 +80,15 @@ function Object:draw()
     love.graphics.setColor(0.2,0.2,0.2,1)
     love.graphics.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))
     love.graphics.setColor(1,1,1,1)
-    love.graphics.print(tostring(self.active).."\n"
-        ..self.body:getMass().."\n"
-        ..self.time.."\n"
-        ..self.vel.."\n"
-        ,x-self.w/2,y-self.h/2)
+
+    love.graphics.draw(self.image(), x, y, self.body:getAngle(), self.imageScaleW, self.imageScaleH,self.imageWidth/2,self.imageHeight/2)
+    if Debug then
+        love.graphics.print(tostring(self.active).."\n"
+            ..self.body:getMass().."\n"
+            ..self.time.."\n"
+            ..self.vel.."\n"
+            ,x-self.w/2,y-self.h/2)
+    end
 end
 
 return Object

@@ -28,24 +28,14 @@ end
 
 local scene
 
-love.physics.setMeter(64)
-local gravity = 5*64 -- 9.81*64 = default
-World = love.physics.newWorld(0, gravity, true)
 function love.load()
+    Debug = false
+    love.physics.setMeter(64)
+    local gravity = 5*64 -- 9.81*64 = default
+    World = love.physics.newWorld(0, gravity, true)
     ChangeScene("game")
     DefaultFont = love.graphics.getFont()
     Font = love.graphics.newFont("assets/font/PressStart2P-Regular.ttf", 18)
-
-    -- local function example(...)
-    --     -- print("a "..a)
-    --     print(select(...,3))
-    --     -- return print(...)
-    -- end
-    -- example(1, 2, 3, 4, 5, 6)
-
-    -- for i = 2, 10, 2 do
-    --     print(i)
-    -- end
 end
 
 function love.update(dt)
@@ -63,6 +53,9 @@ function love.keypressed(key,scancode,isrepeat)
     end
     if key == "r" then
         love.event.quit("restart")
+    end
+    if key == "d" then
+        Debug = not Debug
     end
 end
 

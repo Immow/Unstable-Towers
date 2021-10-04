@@ -36,9 +36,10 @@ function Game:RandomShape()
     if r == 3 then return T.new() end
 end
 
+local win = false
 local continue = false
 function Game:keypressed(key)
-    if key == "space" and not continue then
+    if key == "space" and not continue and not win then
         table.insert(objects.blocks, o.new())
         -- print(tprint(objects.blocks))
         continue = true
@@ -47,6 +48,7 @@ end
 
 function Game:removeObject(i)
     if objects.blocks[i].remove then
+        objects.blocks[i].body:destroy()
         table.remove(objects.blocks, i)
     end
 end
@@ -63,22 +65,59 @@ function Game:addObject1()
     end
 end
 
-function Game:updateObject(dt)
-    for i = #objects.blocks, 1, -1 do
-        objects.blocks[i]:update(dt)
-        self:addObject1()
-        self:removeObject(i)
+local winTimerAmount = 3
+local winTimer = winTimerAmount
+function Game:score()
+    love.graphics.setFont(Font)
+    Font:setLineHeight(1.5)
+    love.graphics.print(#objects.blocks.."\n"..winTimer)
+    if #objects.blocks >= 2 then -- Wincondition
+        win = true
+        -- objects.blocks = {}
+        for i = 1, #objects.blocks do
+            objects.blocks[i].remove = true
+        end
+        -- print(tprint(objects.blocks))
     end
-    self:addObject()
+    love.graphics.setFont(DefaultFont)
+end
+
+function Game:winDraw()
+    if win then
+        love.graphics.setFont(Font)
+        Font:setLineHeight(1.5)
+        love.graphics.setColor(1,1,1,1)
+        love.graphics.printf("YOU WIN", 0, wh/2, ww,"center")
+        love.graphics.setFont(DefaultFont)
+    end
+end
+
+function Game:updateObject(dt)
+    if not win and continue then
+        for i = #objects.blocks, 1, -1 do
+            objects.blocks[i]:update(dt)
+            self:addObject1()
+            self:removeObject(i)
+        end
+        self:addObject()
+    end
 end
 
 function Game:update(dt)
     World:update(dt)
     self:updateObject(dt)
+    if win then
+        winTimer = winTimer - 1 * dt
+        if winTimer < 0 then
+            winTimer = winTimerAmount
+            win = false
+            continue = false
+        end
+    end
 end
 
 function Game:continue()
-    if not continue then
+    if not continue and not win then
         love.graphics.setFont(Font)
         Font:setLineHeight(1.5)
         love.graphics.printf("PRESS SPACE TO START\nUSE ARROW KEYS TO MOVE\nCTRL AND ALT TO ROTATE", 0, wh/2, ww,"center")
@@ -93,11 +132,13 @@ function Game:draw()
     love.graphics.polygon("fill", objects.ground.body:getWorldPoints(objects.ground.shape:getPoints()))
     love.graphics.polygon("fill", objects.leftWall.body:getWorldPoints(objects.leftWall.shape:getPoints()))
     love.graphics.polygon("fill", objects.rightWall.body:getWorldPoints(objects.rightWall.shape:getPoints()))
-    
-    for i = #objects.blocks, 1, -1 do
-        objects.blocks[i]:draw()
+    if not win and continue then
+        for i = #objects.blocks, 1, -1 do
+            objects.blocks[i]:draw()
+        end
+        self:score()
     end
-    love.graphics.print(#objects.blocks)
+    self:winDraw()
 end
 
 return Game
