@@ -3,17 +3,14 @@
 local Object = {}
 Object.__index = Object
 
-function Object.new(b)
+function Object.new()
     local w = love.math.random(30,100)
     local h = love.math.random(30,100)
 
     local o = {}
-        o.body = b.body
-        o.shape = b.shape
+        o.body = love.physics.newBody(World, 200, 0, "dynamic")
+        o.shape = love.physics.newRectangleShape(0, 0, w, h)
         o.fixture = love.physics.newFixture(o.body, o.shape, 1)
-        -- o.body = love.physics.newBody(World, 200, 0, "dynamic")
-        -- o.shape = love.physics.newRectangleShape(0, 0, w, h)
-        -- o.fixture = love.physics.newFixture(o.body, o.shape, 1)
         o.active = true
         o.w = w
         o.h = h

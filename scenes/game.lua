@@ -1,6 +1,9 @@
 ---@diagnostic disable: redundant-parameter
 
 local Square = require("scenes.square")
+local Bar = require("scenes.bar")
+local T = require("scenes.t")
+
 local o = require("scenes.object")
 
 local Game = {}
@@ -26,36 +29,47 @@ objects.rightWall.fixture = love.physics.newFixture(objects.rightWall.body, obje
 
 love.graphics.setBackgroundColor(0.41, 0.53, 0.97)
 
+function Game:RandomShape()
+    local r = love.math.random(1,1)
+    if r == 1 then return Square.new() end
+    if r == 2 then return Bar.new() end
+    if r == 3 then return T.new() end
+end
+
 local continue = false
 function Game:keypressed(key)
     if key == "space" and not continue then
-        table.insert(objects.blocks, o.new(Square.new()))
-        print(tprint(objects.blocks))
+        table.insert(objects.blocks, o.new())
+        -- print(tprint(objects.blocks))
         continue = true
     end
 end
 
 function Game:removeObject(i)
     if objects.blocks[i].remove then
-        -- if i == 1 then -- have to add an object despite this is a remove function else the loop ends :(
-        --     table.insert(objects.blocks,i+1,o.new(Square.new()))
-        -- end
         table.remove(objects.blocks, i)
     end
 end
 
 function Game:addObject()
+    if not next(objects.blocks) and continue then
+        table.insert(objects.blocks, o.new())
+    end
+end
+
+function Game:addObject1()
     if not objects.blocks[#objects.blocks].active and continue then
-        table.insert(objects.blocks, o.new(Square.new()))
+        table.insert(objects.blocks, o.new())
     end
 end
 
 function Game:updateObject(dt)
     for i = #objects.blocks, 1, -1 do
         objects.blocks[i]:update(dt)
-        self:addObject()
+        self:addObject1()
         self:removeObject(i)
     end
+    self:addObject()
 end
 
 function Game:update(dt)
@@ -66,7 +80,8 @@ end
 function Game:continue()
     if not continue then
         love.graphics.setFont(Font)
-        love.graphics.printf("PRESS SPACE TO START\nUSE ARROW KEYS TO MOVE", 0, wh/2, ww,"center")
+        Font:setLineHeight(1.5)
+        love.graphics.printf("PRESS SPACE TO START\nUSE ARROW KEYS TO MOVE\nCTRL AND ALT TO ROTATE", 0, wh/2, ww,"center")
         love.graphics.setFont(DefaultFont)
     end
 end
