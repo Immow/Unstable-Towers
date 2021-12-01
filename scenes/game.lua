@@ -92,7 +92,7 @@ end
 function Game:music()
 	if not Sound.music:isPlaying() then
 		Sound.music:play()
-		Sound.music:setVolume(0.05)
+		Sound.music:setVolume(0.5)
 	end
 end
 
